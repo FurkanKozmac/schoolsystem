@@ -31,6 +31,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
                         // 1. Public Endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
@@ -53,13 +56,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Allow Frontend
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allow all methods
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type")); // Allow Headers
+
+        // Allow Frontend
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        // Allow Methods
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow Headers (Crucial for JWT)
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply to ALL endpoints
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

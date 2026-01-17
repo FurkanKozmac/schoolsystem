@@ -1,13 +1,15 @@
 package com.furkankozmac.schoolsystem.controller;
 
 import com.furkankozmac.schoolsystem.dto.CourseRequest;
-import com.furkankozmac.schoolsystem.entity.Course;
+import com.furkankozmac.schoolsystem.dto.CourseResponse;
+import com.furkankozmac.schoolsystem.dto.StudentGradeResponse;
 import com.furkankozmac.schoolsystem.service.CourseService;
 import com.furkankozmac.schoolsystem.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -19,12 +21,7 @@ public class TeacherController {
     private final TeacherService teacherService;
 
     @PostMapping("/courses")
-    public ResponseEntity<Course> createCourse(@RequestBody CourseRequest request) {
-
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("User: " + auth.getName());
-        System.out.println("Authorities: " + auth.getAuthorities());
-
+    public ResponseEntity<CourseResponse> createCourse(@RequestBody CourseRequest request) {
         return ResponseEntity.ok(courseService.createCourse(request));
     }
 
@@ -35,6 +32,17 @@ public class TeacherController {
     ) {
         teacherService.assignGrade(enrollmentId, grade);
         return ResponseEntity.ok("Grade assigned successfully");
+    }
+
+    @GetMapping("/courses")
+    public ResponseEntity<List<CourseResponse>> getMyCourses() {
+        return ResponseEntity.ok(teacherService.getMyCourses());
+    }
+
+    // GET /api/teacher/courses/5/students
+    @GetMapping("/courses/{courseId}/students")
+    public ResponseEntity<List<StudentGradeResponse>> getStudents(@PathVariable Long courseId) {
+        return ResponseEntity.ok(teacherService.getEnrolledStudents(courseId));
     }
 
 }
